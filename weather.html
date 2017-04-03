@@ -1,0 +1,269 @@
+﻿<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Weather</title>
+<style>
+#keho {
+	background: linear-gradient(to left top, white, grey) fixed;
+	margin-top: 25px;
+	font-size: 21px;
+	text-align: center;	
+}
+
+.fade {
+	-webkit-animation: fadein 2s; /* Safari, Chrome and Opera > 12.1 */
+	-moz-animation: fadein 2s; /* Firefox < 16 */
+	-ms-animation: fadein 2s; /* Internet Explorer */
+	-o-animation: fadein 2s; /* Opera < 12.1 */
+	animation: fadein 2s;
+}
+
+@keyframes fadein {
+    from {
+        opacity:0;
+    }
+    to {
+        opacity:1;
+    }
+}
+@-moz-keyframes fadein { /* Firefox */
+    from {
+        opacity:0;
+    }
+    to {
+        opacity:1;
+    }
+}
+@-webkit-keyframes fadein { /* Safari and Chrome */
+    from {
+        opacity:0;
+    }
+    to {
+        opacity:1;
+    }
+}
+@-o-keyframes fadein { /* Opera */
+    from {
+        opacity:0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+#status {
+	text-align: center;
+}
+
+#temp {
+	text-align: center;
+}
+
+#sky {
+	text-align: center;
+}
+
+form {
+	-webkit-box-shadow: -21px 32px 70px -19px;
+	box-shadow: -21px 32px 70px -19px;
+	display: inline-table;
+}
+
+h1 {
+	font-family: Calibri, "Arial Narrow", Gabriola;
+	font-size: 48px;
+	clear: both;
+}
+
+p {
+	text-transform: uppercase;
+	font-family: Calibri, "Arial Narrow", Gabriola;
+	font-size: 44px;
+	font-weight: bold;	
+}
+
+#kentta {
+	text-transform: capitalize;
+	font-family: Calibri, "Arial Narrow", Gabriola;
+	font-size: 44px;
+	width: 241px;
+	height: 55px;
+}
+
+#nappi {
+	font-family: Calibri, "Arial Narrow", Gabriola;
+	font-size: 38px;
+	width: 172px;
+	height: 61px;
+	vertical-align: top;
+}
+
+#status {
+	height: 359px;
+}
+</style>
+<script>
+
+//Kaupungin nimen tallennus localstorageen/
+
+function getItem() {
+var form=document.forms[0];
+var city=form.childNodes[1].value;
+var letters = /^[a-zA-ZäöåÄÖÅ]+( [a-zA-ZäöåÄÖÅ]+)*$/;
+
+//alphanumeeristen merkkien käytön tarkistus/
+
+if (city.match(letters)){
+localStorage.getItem("city");
+
+console.log("Retrieving data from LocalStorage...");
+localStorage.city = city;
+console.log("Data Saved.");	
+return true;
+}
+else {	
+form.childNodes[1].value="";
+document.getElementById("error").innerHTML = "<h1>" + "Please use letters only" + "</h1>";
+return false;
+}
+}
+
+function hae() {
+	
+//Kapunkia ei haeta jos localstoragessa on tieto/
+	
+ if (localStorage.getItem("city")!=null){	
+ 
+var city=localStorage.getItem("city");
+var xmlhttp = new XMLHttpRequest();
+
+xmlhttp.open("GET","http://api.openweathermap.org/data/2.5/weather?q=" + city + "&units=metric&mode=xml&appid=084bce0507b14f3d9646e2fbd462ab36",true);
+xmlhttp.send();
+
+xmlhttp.onreadystatechange=function() {
+ if (xmlhttp.readyState==4 && xmlhttp.status==200){
+	 var xmlDoc = xmlhttp.responseXML;
+	 console.log("Response Received");
+	 
+//Muuttujien määrittely tiedoille/	 
+
+	 var x = document.getElementsByTagName("style")[0];
+	 var p = document.getElementsByTagName("p");
+	 var h1 = document.getElementsByTagName("h1");
+	 
+	 var temperature =  xmlDoc.getElementsByTagName("temperature")[0];
+	 var sky =  xmlDoc.getElementsByTagName("weather")[0];
+	 var cityname =  xmlDoc.getElementsByTagName("city")[0];
+	  
+	 var temptext = temperature.getAttributeNode("value").value;
+	 var icon = sky.getAttributeNode("icon").value;
+	 var skytext = sky.getAttributeNode("value").value;
+	 var citytext = cityname.getAttributeNode("name").value;
+		 
+//kuvien ja värien asettaminen eri säätiloille/	
+
+	if (icon=="01d" || icon=="01n")	{
+	document.getElementById("status").innerHTML += "<a href='#'><img src='icons/01d.png' border=0/></a>";
+	x.innerHTML = x.innerHTML.replace("grey", "#FF9500");
+	x.innerHTML = x.innerHTML.replace("white", "#FFF300");
+	
+	}
+	else if(icon=="02d" || icon=="02n")	{
+	document.getElementById("status").innerHTML += "<a href='#'><img src='icons/02d.png' border=0/></a>";
+	x.innerHTML = x.innerHTML.replace("grey", "#FF9500");
+	x.innerHTML = x.innerHTML.replace("white", "#FFCB00");
+	
+	}
+	else if(icon=="03d" || icon=="03n")	{
+	document.getElementById("status").innerHTML += "<a href='#'><img src='icons/03d.png' border=0/></a>";
+	x.innerHTML = x.innerHTML.replace("grey", "#1451CC");
+	x.innerHTML = x.innerHTML.replace("white", "#40B7FF");
+	
+	}
+	else if(icon=="04d" || icon=="04n")	{
+	document.getElementById("status").innerHTML += "<a href='#'><img src='icons/04d.png' border=0/></a>";
+	x.innerHTML = x.innerHTML.replace("grey", "#000000");
+	x.innerHTML = x.innerHTML.replace("white", "#4514CC");
+
+	}
+	else if(icon=="09d" || icon=="09n")	{
+	document.getElementById("status").innerHTML += "<a href='#'><img src='icons/09d.png' border=0/></a>";
+	x.innerHTML = x.innerHTML.replace("grey", "#123A8C");
+	x.innerHTML = x.innerHTML.replace("white", "#1451CC");
+	
+	}
+	else if(icon=="10d" || icon=="10n")	{
+	document.getElementById("status").innerHTML += "<a href='#'><img src='icons/10d.png' border=0/></a>";
+	x.innerHTML = x.innerHTML.replace("grey", "#40B7FF");
+	x.innerHTML = x.innerHTML.replace("white", "#FFCB00");
+	
+	}
+	else if(icon=="11d" || icon=="11n")	{
+	document.getElementById("status").innerHTML += "<a href='#'><img src='icons/11d.png' border=0/></a>";
+	x.innerHTML = x.innerHTML.replace("grey", "#000000");
+	x.innerHTML = x.innerHTML.replace("white", "#4514CC");
+
+	}
+	else if(icon=="13d" || icon=="13n")	{
+	document.getElementById("status").innerHTML += "<a href='#'><img src='icons/13d.png' border=0/></a>";
+	x.innerHTML = x.innerHTML.replace("grey", "#ECECEC");
+	x.innerHTML = x.innerHTML.replace("white", "#F8F8F8");
+	
+	}
+	else if(icon=="50d" || icon=="50n")	{
+	document.getElementById("status").innerHTML += "<a href='#'><img src='icons/50d.png' border=0/></a>";
+	x.innerHTML = x.innerHTML.replace("grey", "#9D9D9C");
+	x.innerHTML = x.innerHTML.replace("white", "#CDCDCD");
+	}
+	document.getElementById("temp").innerHTML = "<p>" + temptext + " °C" + "</p>";
+	document.getElementById("sky").innerHTML = "<p>" + skytext + "</p>";
+	document.getElementsByTagName("h1")[0].innerHTML += "<i>" + citytext + "</i>";
+	
+	//Vaaleat tekstit tummille taustoille/
+	
+	if(icon=="50d" || icon=="50n" || icon=="11d" || icon=="11n" || icon=="04d" || icon=="04n" || icon=="03d" || icon=="03n")	{
+	p[0].style.color="white";
+	p[1].style.color="white";
+	h1[0].style.color="white";
+	
+}
+}
+}
+} 
+
+//Aloitustekstit jos localstoragessa ei ole aikaisempaa tietoa
+
+else {
+	document.getElementsByTagName("h1")[0].innerHTML += "<i>" + "?" + "</i>";
+	document.getElementById("temp").innerHTML = "<p>" + "Search for a city to see it's weather" + "</p>";
+	document.getElementById("sky").innerHTML = "<p>" + "Use Name or country code" + "</p>";
+	}
+return false;
+}
+</script>
+</head>
+
+<body id="keho" onLoad="return hae()">
+<div id="status" class="fade">
+
+</div>
+<div id="title" class="fade">
+  <h1>Weather in </h1> 
+</div>
+<div id="temp" class="fade">
+  <p>&nbsp;</p>
+</div>
+<div id="sky" class="fade">
+<p>&nbsp;</p>
+
+</div>
+
+<form onSubmit="return getItem()">
+  <input id="kentta" type="text" name="city" required>
+  <input id="nappi" type="Submit" value="Search">
+  </form>
+  <div id="error" class="fade">
+  </div>
+</body>
+</html>
